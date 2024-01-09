@@ -1,6 +1,6 @@
 const { fontFamily } = require("tailwindcss/defaultTheme")
 
-/** @type {import('tailwindcss').Config} */
+// @type {import('tailwindcss').Config} */
 module.exports = {
     content: [
         "./app/**/*.{ts,tsx}",
@@ -18,6 +18,13 @@ module.exports = {
             },
         },
         extend: {
+            gridTemplateColumns: {
+                // Complex site-specific row configuration
+                'main-content-grid': '1fr .7fr',
+            },
+            maxWidth: {
+                'main-content': "70rem"
+            },
             colors: {
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
@@ -72,7 +79,7 @@ module.exports = {
             },
             fontFamily: {
                 sans: ["var(--font-sans)", ...fontFamily.sans],
-                // heading: ["var(--font-heading)", ...fontFamily.sans],
+                heading: ["var(--font-heading)", ...fontFamily.sans],
             },
             keyframes: {
                 "accordion-down": {
@@ -90,4 +97,5 @@ module.exports = {
             },
         },
     },
+    plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 }
