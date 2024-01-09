@@ -40,7 +40,7 @@ const SearchBox = () => {
                         <input className="w-full text-base placeholder:text-gray-600 focus:outline-none p-2 bg-transparent" type='name' placeholder="Try Searching 'Javascript Developers'" onChange={searchHandler} />
                     </div>
                     <div className="h-3 my-3 flex items-center justify-center">
-                        {input && <span className="block text-sm text-gray-500">Search for '{input}'</span> }
+                        {input && <span className="block text-sm text-gray-500">Search for &apos;{input}&apos;</span> }
                     </div>
                 </form>
                 <div className="">

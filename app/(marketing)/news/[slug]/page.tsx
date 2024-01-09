@@ -6,7 +6,7 @@ const DetailArticle = () => {
                     <header className="mx-auto mt-20 max-w-screen-lg rounded-t-lg bg-white pt-16 text-center shadow-lg">
                         <p className="text-gray-500">Published April 4, 2022</p>
                         <h1 className="mt-2 text-4xl font-bold text-gray-900 sm:text-5xl">Why quit now?</h1>
-                        <p className="mt-6 text-lg text-gray-700">You've come way farther than you expected</p>
+                        <p className="mt-6 text-lg text-gray-700">You&apos;ve come way farther than you expected</p>
                         <div className="mt-6 flex flex-wrap justify-center gap-2">
                             <button className="rounded-lg bg-gray-100 px-2 py-1 font-medium text-gray-600 hover:bg-gray-200">Marketing</button>
                             <button className="rounded-lg bg-gray-100 px-2 py-1 font-medium text-gray-600 hover:bg-gray-200">Branding</button>

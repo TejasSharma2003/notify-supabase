@@ -1,6 +1,5 @@
 import Article from "@/components/home/article";
 import SideArticle from "@/components/home/side-article";
-import { NAVBAR_HEIGHT } from "@/config/site";
 
 
 const IndexPage = () => {

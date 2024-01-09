@@ -2,7 +2,7 @@
 import React from "react";
 import clsx from "clsx";
 import Link from "next/link";
-import { Button } from "./ui/button";
+import { Button, buttonVariants } from "./ui/button";
 import { SheetTrigger, Sheet, SheetContent } from "./ui/sheet";
 import { SearchIcon } from 'lucide-react';
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import SearchBox from "@/components/search-box";
 import SideNavbar from "./side-navbar";
+import Logo from "./logo";
 
 const Navbar = () => {
     const [show, setShow] = React.useState(true);
@@ -38,13 +39,11 @@ const Navbar = () => {
     }, [lastScrollY]);
 
     return (
-        <div className={clsx(`fixed h-20 top-0 z-20 w-full bg-secondary border-b border-b-border transition-transform duration-300`, {
+        <div className={clsx(`fixed h-20 top-0 z-20 w-full bg-white border-b border-b-border transition-transform duration-300`, {
             '-translate-y-full': !show,
         })}>
             <nav className="font-sans flex container items-center py-5">
-                <Link href="/" className="w-2/6">
-                    <h1 className="text-4xl font-bold text-gray-900 font-heading">notify<span className="text-primary">.</span></h1>
-                </Link>
+                <Logo />
                 <div className="w-2/6 text-xs font-semibold flex justify-center text-gray-500">
                     <span>
                         <span>
@@ -57,7 +56,7 @@ const Navbar = () => {
                     </span>
                 </div>
                 <div className="flex items-center justify-end w-2/6 text-gray-900">
-                    <Button className={clsx(' mr-7')}>
+                    <Button className={clsx(buttonVariants({ variant: "secondary" }), ' mr-7')}>
                         Suscribe to newsletter
                     </Button>
                     <Dialog>
@@ -85,8 +84,13 @@ const Navbar = () => {
                             <SideNavbar />
                         </SheetContent>
                     </Sheet>
+                    <Link href="/login">
+                        <Button className={clsx('ml-5')}>
+                            Login
+                        </Button>
+                    </Link>
                 </div>
-            </nav >
+            </nav>
         </div>
     )
 }

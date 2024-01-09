@@ -1,8 +1,6 @@
-import Navbar from "@/components/navbar"
 import "../styles/global.css"
 import localFont from "next/font/local"
 import { ThemeProvider } from "@/components/theme-provider"
-import RespectNavbar from "@/components/respect-navbar"
 
 
 const lato = localFont({
@@ -45,10 +43,7 @@ export default function RootLayout({
         <html lang="en">
             <body className={`${lato.variable} ${fontHeading.variable}`}>
                 <ThemeProvider >
-                    <Navbar />
-                    <RespectNavbar>
-                        {children}
-                    </RespectNavbar>
+                    {children}
                 </ThemeProvider>
             </body>
         </html>
