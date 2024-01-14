@@ -1,8 +1,11 @@
 import Article from "@/components/home/article";
 import SideArticle from "@/components/home/side-article";
+import MainSkeletonArticle from "@/components/ui/main-skeleton-article";
+import { Suspense } from "react";
 
 
-const IndexPage = () => {
+const IndexPage = async () => {
+
     return (
         <div className='container'>
             <div className="text-center mt-8 mb-12">
@@ -11,8 +14,12 @@ const IndexPage = () => {
 
             {/* main content grid */}
             <div className="grid grid-cols-main-content-grid gap-10 max-w-7xl mx-auto">
-                <Article/>
-                <SideArticle/>
+                <Suspense fallback={<MainSkeletonArticle/>}>
+                    <Article />
+                </Suspense>
+                {/* <Suspense fallback={<MainSkeletonArticle/>}> */}
+                {/*     <SideArticle /> */}
+                {/* </Suspense> */}
             </div>
         </div>
     )

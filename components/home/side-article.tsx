@@ -1,3 +1,4 @@
+import { delay } from "@/lib/utils"
 import { Heart } from "lucide-react"
 import Image from "next/image"
 
@@ -38,7 +39,9 @@ const SingleSideArticle = () => {
 
 }
 
-const SideArticle = () => {
+const SideArticle = async () => {
+    await delay(3400);
+
     return (
         <div className="sticky top-0 self-start">
             <h1 className="font-heading text-2xl mb-8">Trending news here</h1>

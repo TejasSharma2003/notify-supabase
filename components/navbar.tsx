@@ -1,10 +1,9 @@
 'use client'
+import Logo from "./logo";
 import React from "react";
 import clsx from "clsx";
 import Link from "next/link";
-import { Button, buttonVariants } from "./ui/button";
-import { SheetTrigger, Sheet, SheetContent } from "./ui/sheet";
-import { SearchIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation'
 import {
     Dialog,
     DialogContent,
@@ -12,11 +11,17 @@ import {
 } from "@/components/ui/dialog"
 import SearchBox from "@/components/search-box";
 import SideNavbar from "./side-navbar";
-import Logo from "./logo";
+import { createBrowserClient } from "@/utils/supabase/client";
+import { toast } from "./ui/use-toast";
+import { Button, buttonVariants } from "./ui/button";
+import { SheetTrigger, Sheet, SheetContent } from "./ui/sheet";
+import { SearchIcon } from "lucide-react";
 
-const Navbar = () => {
+const Navbar = ({ token }: { token: string }) => {
     const [show, setShow] = React.useState(true);
     const [lastScrollY, setLastScrollY] = React.useState(0);
+    const supabase = createBrowserClient();
+    const router = useRouter();
 
     const controlNavbar = () => {
         if (window.scrollY > lastScrollY) { // if scroll down hide the navbar
@@ -38,6 +43,24 @@ const Navbar = () => {
         };
     }, [lastScrollY]);
 
+    const handleSignOut = async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+            return toast({
+                description: "Something went wrong while signing out",
+                variant: "destructive"
+            })
+        }
+        toast({
+            description: "Signout Successfully",
+            variant: "default"
+        })
+        router.refresh();
+    }
+
     return (
         <div className={clsx(`fixed h-20 top-0 z-20 w-full bg-white border-b border-b-border transition-transform duration-300`, {
             '-translate-y-full': !show,
@@ -56,9 +79,9 @@ const Navbar = () => {
                     </span>
                 </div>
                 <div className="flex items-center justify-end w-2/6 text-gray-900">
-                    <Button className={clsx(buttonVariants({ variant: "secondary" }), ' mr-7')}>
-                        Suscribe to newsletter
-                    </Button>
+                    {/* <Button className={clsx(buttonVariants({ variant: "outline" }), ' mr-7')}> */}
+                    {/*     Suscribe to newsletter */}
+                    {/* </Button> */}
                     <Dialog>
                         <DialogTrigger>
                             <span className="cursor-pointer">
@@ -84,11 +107,24 @@ const Navbar = () => {
                             <SideNavbar />
                         </SheetContent>
                     </Sheet>
-                    <Link href="/login">
-                        <Button className={clsx('ml-5')}>
-                            Login
-                        </Button>
-                    </Link>
+                    {token === "" ?
+                        <Link href="/login">
+                            <Button className={clsx('ml-5')}>
+                                Login
+                            </Button>
+                        </Link>
+                        :
+                        <>
+                            <Link href="/dashboard">
+                                <Button className={clsx('ml-5')}>
+                                    Dashboard
+                                </Button>
+                            </Link>
+                            <Button onClick={handleSignOut} className={clsx('ml-5', buttonVariants({ variant: "outline" }))}>
+                                Signout
+                            </Button>
+                        </>
+                    }
                 </div>
             </nav>
         </div>

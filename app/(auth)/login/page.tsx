@@ -5,19 +5,31 @@ import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
 import { UserAuthForm } from "@/components/user-auth-form"
-import Logo from "@/components/logo"
+import { cookies } from "next/headers"
+import { createServerClient } from "@/utils/supabase/server"
+import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
     title: "Login",
     description: "Login to your account",
 }
 
-export default function LoginPage() {
+export default async function LoginPage() {
+
+    const cookieStore = cookies();
+    const supabase = createServerClient(cookieStore);
+
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (session?.access_token) {
+        redirect("/dashboard");
+    }
+
     return (
         <div className="container flex h-screen w-screen flex-col items-center justify-center font-sans">
             <Link
                 href="/"
-                className={cn( buttonVariants({ variant: "ghost" }), "absolute left-4 top-4 md:left-8 md:top-8")} >
+                className={cn(buttonVariants({ variant: "ghost" }), "absolute left-4 top-4 md:left-8 md:top-8")} >
                 <>
                     <Icons.chevronLeft className="mr-2 h-4 w-4" />
                     Back
@@ -32,7 +44,7 @@ export default function LoginPage() {
                         Enter your email to sign in to your account
                     </p>
                 </div>
-                <UserAuthForm />
+                <UserAuthForm forLogin={true} />
                 <p className="px-8 text-center text-sm text-muted-foreground">
                     <Link
                         href="/register"

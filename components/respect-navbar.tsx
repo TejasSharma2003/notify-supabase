@@ -7,7 +7,7 @@ type RespectNavbarProps = {
 }
 const RespectNavbar = ({ children }: RespectNavbarProps) => {
     return (
-        <main className={clsx('pt-4', `mt-${NAVBAR_HEIGHT}`)} >{children}</main>
+        <main className={clsx('pt-4', `mt-20`)} >{children}</main>
     )
 }
 export default RespectNavbar;

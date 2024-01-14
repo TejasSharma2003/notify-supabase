@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { useSearchParams } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 // import { signIn } from "next-auth/react"
 import { useForm } from "react-hook-form"
@@ -15,45 +14,38 @@ import { Label } from "@/components/ui/label"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons"
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> { }
+// supabase authentication
+import { createBrowserClient } from "@/utils/supabase/client"
+import { useRouter } from 'next/navigation'
+
+interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
+    forLogin?: boolean
+}
 
 type FormData = z.infer<typeof userAuthSchema>
 
-export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm<FormData>({
-        resolver: zodResolver(userAuthSchema),
-    })
+export function UserAuthForm({ className, forLogin, ...props }: UserAuthFormProps) {
+    const { register, handleSubmit, formState: { errors }, } = useForm<FormData>({ resolver: zodResolver(userAuthSchema) });
     const [isLoading, setIsLoading] = React.useState<boolean>(false)
     const [isGitHubLoading, setIsGitHubLoading] = React.useState<boolean>(false)
-    const searchParams = useSearchParams()
+    const supabase = createBrowserClient();
+    const router = useRouter();
 
     async function onSubmit(data: FormData) {
         setIsLoading(true)
-
-        // const signInResult = await signIn("email", {
-        //     email: data.email.toLowerCase(),
-        //     redirect: false,
-        //     callbackUrl: searchParams?.get("from") || "/dashboard",
-        // })
-        //
-        // setIsLoading(false)
-
-        // if (!signInResult?.ok) {
-        //     return toast({
-        //         title: "Something went wrong.",
-        //         description: "Your sign in request failed. Please try again.",
-        //         variant: "destructive",
-        //     })
-        // }
-
-        return toast({
-            title: "Check your email",
-            description: "We sent you a login link. Be sure to check your spam too.",
+        const { error } = await supabase.auth.signInWithPassword({
+            email: data.email,
+            password: data.password,
         })
+        if (error) {
+            setIsLoading(false);
+            return toast({
+                variant: "destructive",
+                description: error?.message,
+            })
+        }
+        setIsLoading(false);
+        router.refresh();
     }
 
     return (
@@ -79,12 +71,29 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
                                 {errors.email.message}
                             </p>
                         )}
+                        <Label className="sr-only" htmlFor="password">
+                            password
+                        </Label>
+                        <Input
+                            id="password"
+                            placeholder="**************"
+                            type="password"
+                            disabled={isLoading || isGitHubLoading}
+                            {...register("password")}
+                        />
+                        {errors?.password && (
+                            <p className="px-1 text-xs text-red-600">
+                                {errors.password.message}
+                            </p>
+                        )}
                     </div>
-                    <button className={cn(buttonVariants())} disabled={isLoading}>
-                        {isLoading && (
+                    <button className={cn(buttonVariants())} disabled={isLoading || isGitHubLoading}>
+                        {(isLoading || isGitHubLoading) && (
                             <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
                         )}
-                        Sign In with Email
+                        {forLogin ? <span> Sign In with Credentials </span>
+                            :
+                            <span> Sign Up with Credentials </span>}
                     </button>
                 </div>
             </form>
@@ -101,10 +110,9 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             <button
                 type="button"
                 className={cn(buttonVariants({ variant: "outline" }))}
-                // onClick={() => {
-                //     setIsGitHubLoading(true)
-                //     signIn("github")
-                // }}
+                onClick={() => {
+                    setIsGitHubLoading(true)
+                }}
                 disabled={isLoading || isGitHubLoading}
             >
                 {isGitHubLoading ? (

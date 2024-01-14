@@ -1,6 +1,7 @@
 import "../styles/global.css"
 import localFont from "next/font/local"
 import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/toaster";
 
 
 const lato = localFont({
@@ -42,9 +43,8 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={`${lato.variable} ${fontHeading.variable}`}>
-                <ThemeProvider >
-                    {children}
-                </ThemeProvider>
+                <Toaster />
+                {children}
             </body>
         </html>
     )
