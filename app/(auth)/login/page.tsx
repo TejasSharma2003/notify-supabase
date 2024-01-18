@@ -6,7 +6,7 @@ import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
 import { UserAuthForm } from "@/components/user-auth-form"
 import { cookies } from "next/headers"
-import { createServerClient } from "@/utils/supabase/server"
+import { createServerClient } from "@/lib/supabase/server"
 import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {

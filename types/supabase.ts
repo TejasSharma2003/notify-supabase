@@ -11,14 +11,14 @@ export interface Database {
     Tables: {
       articles: {
         Row: {
-          author_id: string | null
-          content: string
+          always_show: boolean
+          author_id: string
+          content: string | null
           cover_image: string
           created_at: string
           description: string
           id: string
           is_published: boolean
-          is_trending: boolean
           likes: number | null
           reads: number | null
           shares: number | null
@@ -27,14 +27,14 @@ export interface Database {
           updated_at: string
         }
         Insert: {
-          author_id?: string | null
-          content?: string
+          always_show?: boolean
+          author_id?: string
+          content?: string | null
           cover_image?: string
           created_at?: string
           description?: string
           id?: string
           is_published?: boolean
-          is_trending?: boolean
           likes?: number | null
           reads?: number | null
           shares?: number | null
@@ -43,14 +43,14 @@ export interface Database {
           updated_at?: string
         }
         Update: {
-          author_id?: string | null
-          content?: string
+          always_show?: boolean
+          author_id?: string
+          content?: string | null
           cover_image?: string
           created_at?: string
           description?: string
           id?: string
           is_published?: boolean
-          is_trending?: boolean
           likes?: number | null
           reads?: number | null
           shares?: number | null
@@ -73,6 +73,13 @@ export interface Database {
         Returns: undefined
       }
       increment: {
+        Args: {
+          x: number
+          articles_id: string
+        }
+        Returns: undefined
+      }
+      increment_reads: {
         Args: {
           x: number
           articles_id: string

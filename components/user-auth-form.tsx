@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
+
 // import { signIn } from "next-auth/react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -15,7 +16,7 @@ import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons"
 
 // supabase authentication
-import { createBrowserClient } from "@/utils/supabase/client"
+import { createBrowserClient } from "@/lib/supabase/client"
 import { useRouter } from 'next/navigation'
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -25,13 +26,23 @@ interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
 type FormData = z.infer<typeof userAuthSchema>
 
 export function UserAuthForm({ className, forLogin, ...props }: UserAuthFormProps) {
-    const { register, handleSubmit, formState: { errors }, } = useForm<FormData>({ resolver: zodResolver(userAuthSchema) });
+    const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(userAuthSchema) });
     const [isLoading, setIsLoading] = React.useState<boolean>(false)
-    const [isGitHubLoading, setIsGitHubLoading] = React.useState<boolean>(false)
+    const [isGoogleLoading, setIsGitHubLoading] = React.useState<boolean>(false)
     const supabase = createBrowserClient();
     const router = useRouter();
 
     async function onSubmit(data: FormData) {
+        if (!forLogin) {
+            console.log(data);
+            const { data: res, error } = await supabase.auth.signUp({
+                email: data.email,
+                password: data.password,
+            })
+            console.log(error);
+            console.log(res);
+            return;
+        }
         setIsLoading(true)
         const { error } = await supabase.auth.signInWithPassword({
             email: data.email,
@@ -40,8 +51,9 @@ export function UserAuthForm({ className, forLogin, ...props }: UserAuthFormProp
         if (error) {
             setIsLoading(false);
             return toast({
-                variant: "destructive",
+                title: "Auth error",
                 description: error?.message,
+                variant: "destructive",
             })
         }
         setIsLoading(false);
@@ -63,7 +75,7 @@ export function UserAuthForm({ className, forLogin, ...props }: UserAuthFormProp
                             autoCapitalize="none"
                             autoComplete="email"
                             autoCorrect="off"
-                            disabled={isLoading || isGitHubLoading}
+                            disabled={isLoading || isGoogleLoading}
                             {...register("email")}
                         />
                         {errors?.email && (
@@ -76,9 +88,9 @@ export function UserAuthForm({ className, forLogin, ...props }: UserAuthFormProp
                         </Label>
                         <Input
                             id="password"
-                            placeholder="**************"
+                            placeholder="your password"
                             type="password"
-                            disabled={isLoading || isGitHubLoading}
+                            disabled={isLoading || isGoogleLoading}
                             {...register("password")}
                         />
                         {errors?.password && (
@@ -87,8 +99,8 @@ export function UserAuthForm({ className, forLogin, ...props }: UserAuthFormProp
                             </p>
                         )}
                     </div>
-                    <button className={cn(buttonVariants())} disabled={isLoading || isGitHubLoading}>
-                        {(isLoading || isGitHubLoading) && (
+                    <button className={cn(buttonVariants())} disabled={isLoading || isGoogleLoading}>
+                        {(isLoading || isGoogleLoading) && (
                             <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
                         )}
                         {forLogin ? <span> Sign In with Credentials </span>
@@ -113,14 +125,14 @@ export function UserAuthForm({ className, forLogin, ...props }: UserAuthFormProp
                 onClick={() => {
                     setIsGitHubLoading(true)
                 }}
-                disabled={isLoading || isGitHubLoading}
+                disabled={isLoading || isGoogleLoading}
             >
-                {isGitHubLoading ? (
+                {isGoogleLoading ? (
                     <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
-                    <Icons.gitHub className="mr-2 h-4 w-4" />
+                    <Icons.google className="mr-2 h-4 w-4" />
                 )}{" "}
-                Github
+                Google
             </button>
         </div>
     )

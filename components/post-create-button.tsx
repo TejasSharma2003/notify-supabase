@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { cn, delay } from "@/lib/utils"
 import { ButtonProps, buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
-import { createBrowserClient } from "@/utils/supabase/client"
+import { createBrowserClient } from "@/lib/supabase/client"
 import { toast } from "./ui/use-toast"
 
 

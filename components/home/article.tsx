@@ -1,39 +1,21 @@
 import Link from "next/link";
 import Image from "next/image"
-import { notFound } from "next/navigation";
 import { v4 } from "uuid";
-import { createServerClient } from "@/utils/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 import { Database } from "@/types/supabase";
-import { shimmer, toBase64, formatDate } from "@/lib/utils";
+import { formatDate, shimmer, toBase64 } from "@/lib/utils";
 import { cookies } from "next/headers";
 import { NUMBER_OF_ROWS } from "@/config/site";
-import likeArticle from "@/actions/articles/like-article";
-import LikeButton from "../like-button";
-import { delay } from '@/lib/utils'
+import BottomArticleBar from "./bottom-article-bar";
+import { getPublicImageUrl } from "@/actions/images/get-public-url";
+import { unstable_noStore } from "next/cache";
 
-
-async function getPublicImageUrl(article: {
-    id: string,
-    author_id: string,
-}, fileName: string) {
-    const cookiesStore = cookies();
-    const supabase = createServerClient(cookiesStore);
-    const bucketName =
-        process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET_POSTS || "cover-image";
-    const { data } = await supabase.storage
-        .from(bucketName)
-        .getPublicUrl(`${article.author_id}/${fileName}`);
-
-    if (data && data.publicUrl) return data.publicUrl;
-
-    return "/images/not-found.jpg";
-}
 
 
 const SingleArticle = async ({ article }: { article: Article }) => {
     return (
-        <article className="font-sans max-w-[637px]">
-            <div className="flex">
+        <article className="font-sans max-w-[640px]">
+            <div className="grid  grid-cols-[1.5fr_1fr] ">
                 <div className="relative flex-1 mr-6">
                     <span className="text-sm text-gray-500">
                         {formatDate(article.updated_at)}
@@ -45,11 +27,12 @@ const SingleArticle = async ({ article }: { article: Article }) => {
                 </div>
                 <div className="overflow-hidden rounded ml-auto">
                     <Image
-                        src={await getPublicImageUrl({ id: article.id, author_id: article.author_id }, article.cover_image)}
+                        src={await getPublicImageUrl({ authorId: article.author_id, fileName: article.cover_image })}
                         alt={article.header_image || "cover"}
-                        className="hover:scale-110 transition-transform w-[240px] h-[162px] object-cover"
+                        className="hover:scale-110 w-full h-full transition-transform object-cover"
                         width={240}
                         height={162}
+                        placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(240, 162))}`}
                     />
                 </div>
             </div>
@@ -57,25 +40,10 @@ const SingleArticle = async ({ article }: { article: Article }) => {
                 <div className="w-1 rounded bg-primary"></div>
                 <div className="ml-2">
                     <span className="text-sm font-semibold text-gray-800">Description</span>
-                    <p className="text-base text-gray-700">{article.description}</p>
+                    <p className="text-base text-gray-700 line-clamp-3">{article.description}</p>
                 </div>
             </div>
-            <div className="relative text-start mt-2">
-                <span className="text-sm  underline underline-offset-4">Read more</span>
-                <Link href={`/news/${article.slug}`} className="absolute inset-0">
-                    <span className="sr-only">View Article</span>
-                </Link>
-            </div>
-            <div className="flex justify-between mt-2">
-                <span className="text-gray-500">{article.reads}+ reads</span>
-                <div className="flex text-sm">
-                    <LikeButton likes={article.likes} articleId={article.id} />
-                    <span className="ml-3 flex items-center">
-                        <img src="/whatsapp.png" className="w-[23px] h-[23px]" />
-                        <span className="ml-1">{article.shares}</span>
-                    </span>
-                </div>
-            </div>
+            <BottomArticleBar article={article} />
         </article>
     )
 }
@@ -85,7 +53,12 @@ const Article = async () => {
     const cookieStore = cookies();
     const supabase = createServerClient<Database>(cookieStore);
 
-    const { data: articles, error } = await supabase.from("articles").select("*").match({ "is_published": true }).limit(NUMBER_OF_ROWS);
+    const { data: articles, error } = await supabase
+        .from("articles")
+        .select("*")
+        .match({ "is_published": true, "always_show": false })
+        .order("created_at", { ascending: false })
+        .limit(NUMBER_OF_ROWS);
 
     if (error) {
         return <h1>There is an error</h1>
@@ -96,7 +69,7 @@ const Article = async () => {
     }
 
     return (
-        <div className="grid gap-14">
+        <div className="grid gap-y-14">
             {articles?.map((article) => (
                 <SingleArticle key={v4()} article={article} />
             ))}

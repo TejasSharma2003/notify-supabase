@@ -1,37 +1,35 @@
-import { delay } from "@/lib/utils"
-import { Heart } from "lucide-react"
+import { NUMBER_OF_SIDEARTICLES } from "@/config/site"
+import { Database } from "@/types/supabase"
+import { createServerClient } from "@/lib/supabase/server"
+import { cookies } from "next/headers"
+import Link from "next/link"
 import Image from "next/image"
+import { v4 } from 'uuid'
+import BottomArticleBar from "./bottom-article-bar"
+import { getPublicImageUrl } from "@/actions/images/get-public-url"
 
-const SingleSideArticle = () => {
+const SingleSideArticle = async ({ article }: { article: Article }) => {
     return (
         <article className="font-sans max-w-[637px]">
-            <div className="flex align-top flex-row-reverse">
+            <div className="grid  grid-cols-[1fr_1.5fr] gap-y-2">
                 <div className="ml-5">
-                    <div className="flex justify-between text-xs">
-                        <span className="text-gray-500">300+ reads</span>
-                        <div className="flex ">
-                            <span className="flex items-center">
-                                <Heart className="stroke-red-500" width={18} />
-                                <span className="ml-1">3400</span>
-                            </span>
-                            <span className="ml-3 flex items-center ">
-                                <img src="/whatsapp.png" className="w-[20px] h-[20px]" />
-                                <span className="ml-1">400</span>
-                            </span>
-                        </div>
+                    <div className="relative">
+                        <h3 className="my-2 text-base leading-6 line-clamp-1">{article.title}</h3>
+                        <p className="line-clamp-2 text-gray-700 text-sm">{article.description}</p>
+                        <Link href={`/news/${article.slug}`} className="absolute inset-0">
+                            <span className="sr-only">View Article</span>
+                        </Link>
                     </div>
-                    <h3 className="my-2 text-base leading-6">6-Year-Old Horse Dies at Belmont Park After Race Injury</h3>
-                    <p className="text-gray-700 text-sm">NEW YORK—A 6-year-old horse died after being injured in a race at Belmont Park ahead of next week’s</p>
+                    <BottomArticleBar article={article} />
                 </div>
-                <div className="rounded overflow-hidden">
+                <div className="rounded overflow-hidden order-first">
                     <Image
-                        src="/putin.jpg"
-                        className="hover:scale-110 transition-transform h-full w-full"
-                        alt="putin-fight"
-                        width={500}
-                        height={500}
+                        src={await getPublicImageUrl({ authorId: article.author_id, fileName: article.cover_image })}
+                        className="block hover:scale-110 transition-transform object-cover  h-full"
+                        alt="cover-image"
+                        width={204}
+                        height={137}
                     />
-
                 </div>
             </div>
         </article>
@@ -40,16 +38,30 @@ const SingleSideArticle = () => {
 }
 
 const SideArticle = async () => {
-    await delay(3400);
+    const cookieStore = cookies();
+    const supabase = createServerClient<Database>(cookieStore);
+
+    const { data: articles, error } = await supabase
+        .from("articles")
+        .select("*")
+        .match({ "is_published": true, "always_show": true })
+        .order("created_at", { ascending: false })
+        .limit(NUMBER_OF_SIDEARTICLES);
+
+    if (error) {
+        return <h1>There is an error</h1>
+    };
+
+    if (articles?.length === 0) {
+        return <h1>All tasted.</h1>
+    }
 
     return (
-        <div className="sticky top-0 self-start">
-            <h1 className="font-heading text-2xl mb-8">Trending news here</h1>
+        <div className="sticky top-0 self-start max-w-lg">
             <div className="grid gap-10">
-                <SingleSideArticle />
-                <SingleSideArticle />
-                <SingleSideArticle />
-                <SingleSideArticle />
+                {articles.map((article) => (
+                    <SingleSideArticle key={v4()} article={article} />
+                ))}
             </div>
         </div>
     )

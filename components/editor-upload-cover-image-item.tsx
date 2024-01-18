@@ -17,9 +17,7 @@ import { shimmer, toBase64 } from "@/lib/utils";
 import { Loader2 as SpinnerIcon, TrashIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Dispatch, FC, SetStateAction, useState } from "react";
-
-type Dispatcher<S> = Dispatch<SetStateAction<S>>;
+import { FC } from "react";
 
 interface EditorUploadCoverImageItemProps {
     authorId: string;
@@ -29,7 +27,8 @@ interface EditorUploadCoverImageItemProps {
 
 const EditorUploadCoverImageItem: FC<EditorUploadCoverImageItemProps> = ({
     authorId,
-    coverImage
+    coverImage,
+    articleId
 }) => {
     const router = useRouter();
     const [isDeleteLoading, setIsDeleteLoading] = React.useState(false);
@@ -39,11 +38,11 @@ const EditorUploadCoverImageItem: FC<EditorUploadCoverImageItemProps> = ({
         const imageData = {
             authorId: authorId,
             coverImage: coverImage,
+            articleId: articleId
         };
         const response = await deleteCoverImage(imageData);
         if (response) {
             setIsDeleteLoading(false);
-            console.log(response)
             router.refresh();
         } else {
             setIsDeleteLoading(false);
@@ -57,42 +56,44 @@ const EditorUploadCoverImageItem: FC<EditorUploadCoverImageItemProps> = ({
                 src={imageUrl || "./image-not-found.jpg"}
                 className="mb-5 rounded-lg shadow-sm"
                 alt="Cover image"
-                height={400}
+                height={337}
                 width={600}
                 priority
-                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 337))}`}
+                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(600, 337))}`}
             />
-            <AlertDialog>
-                <AlertDialogTrigger asChild>
-                    <Button variant="outline">
-                        <TrashIcon className="mr-2 h-4 w-4" />
-                        {protectedEditorConfig.deleteImage}
-                    </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                    <AlertDialogHeader className="font-sans">
-                        <AlertDialogTitle>
-                            {protectedEditorConfig.deleteImageQuestion}
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                            {protectedEditorConfig.deleteImageDescription}
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter className="font-sans">
-                        <AlertDialogCancel>
-                            {protectedEditorConfig.cancel}
-                        </AlertDialogCancel>
-                        <AlertDialogAction onClick={deleteImage}>
-                            {isDeleteLoading ? (
-                                <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
-                            ) : (
-                                <TrashIcon className="mr-2 h-4 w-4" />
-                            )}
-                            <span>{protectedEditorConfig.cofirm}</span>
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <div className="flex items-center gap-x-5">
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button variant="destructive">
+                            <TrashIcon className="mr-2 h-4 w-4" />
+                            {protectedEditorConfig.deleteImage}
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader className="font-sans">
+                            <AlertDialogTitle>
+                                {protectedEditorConfig.deleteImageQuestion}
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                                {protectedEditorConfig.deleteImageDescription}
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter className="font-sans">
+                            <AlertDialogCancel>
+                                {protectedEditorConfig.cancel}
+                            </AlertDialogCancel>
+                            <AlertDialogAction onClick={deleteImage}>
+                                {isDeleteLoading ? (
+                                    <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
+                                ) : (
+                                    <TrashIcon className="mr-2 h-4 w-4" />
+                                )}
+                                <span>{protectedEditorConfig.cofirm}</span>
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            </div>
         </div>
     );
 };

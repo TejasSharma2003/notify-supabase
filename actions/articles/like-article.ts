@@ -1,7 +1,7 @@
 "use server"
 
 import { cookies } from "next/headers"
-import { createServerClient } from "@/utils/supabase/server"
+import { createServerClient } from "@/lib/supabase/server"
 import { Database } from "@/types/supabase";
 
 export default async function likeArticle(articleId: string) {

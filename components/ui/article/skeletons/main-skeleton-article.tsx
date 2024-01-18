@@ -1,11 +1,9 @@
-import React from "react";
-
 const MainArticleItemDesktopLoading = () => {
     return (
         <div
             role="status"
-            className="mx-auto hidden max-w-[637px] flex-col items-center justify-center space-y-8 md:flex" >
-            <div className="mx-auto max-w-3xl animate-pulse rounded-md dark:border-gray-700">
+            className="hidden max-w-[640px] flex-col items-center justify-center space-y-8 md:flex" >
+            <div className="mx-auto max-w-3xl w-full animate-pulse rounded-md dark:border-gray-700">
                 <div className="flex">
                     <div className="mt-4 flex-col mr-4">
                         <div className="mb-4 h-3 bg-gray-200 rounded-full w-20"></div>
@@ -40,5 +38,20 @@ const MainArticleItemDesktopLoading = () => {
     );
 };
 
-export default MainArticleItemDesktopLoading;
+const MainSkeletonArticle = () => {
+    return (
+        <>
+            {/* LoadingItems */}
+            <div className="flex flex-col">
+                <MainArticleItemDesktopLoading />
+                <MainArticleItemDesktopLoading />
+                <MainArticleItemDesktopLoading />
+                <MainArticleItemDesktopLoading />
+                <MainArticleItemDesktopLoading />
+            </div>
+        </>
+    );
+};
+
+export default MainSkeletonArticle;;
 

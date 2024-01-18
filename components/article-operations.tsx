@@ -21,16 +21,19 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { toast } from "@/components/ui/use-toast"
+
 import { Icons } from "@/components/icons"
 import deleteArticle from "@/actions/articles/delete"
 import publishArticle from "@/actions/articles/publish"
+import { hideArticleFromSidebar, showArticleInSidebar } from "@/actions/articles/sidebar-article-visibility"
+import { toast } from "./ui/use-toast"
 
 interface ArticleOperationsProps {
     article: {
         id: string,
         title: string
         is_published: boolean
+        always_show: boolean
     }
 }
 
@@ -60,6 +63,30 @@ export function ArticleOperations({ article }: ArticleOperationsProps) {
                         onSelect={() => setShowPublishPopup(true)}
                     >
                         {article.is_published ? "Unpublish" : "Publish"}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                        className="flex cursor-pointer items-center"
+                        onClick={async () => {
+                            if (article.always_show) {
+                                const res = await hideArticleFromSidebar({ articleId: article.id, always_show: article.always_show })
+                                if (!res) {
+                                    return toast({
+                                        description: "Something went wrong  please try again",
+                                        variant: "destructive"
+                                    })
+                                }
+                            } else {
+                                const res = await showArticleInSidebar({ articleId: article.id, always_show: article.always_show })
+                                if (!res) {
+                                    return toast({
+                                        description: "Something went wrong  please try again",
+                                        variant: "destructive"
+                                    })
+                                }
+                            }
+                        }}>
+                        {article.always_show ? "Hide from sidebar" : "Show in sidebar"}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
@@ -136,11 +163,7 @@ export function ArticleOperations({ article }: ArticleOperationsProps) {
                             }}
                             className="bg-primary focus:ring-red-600"
                         >
-                            {isPublishLoading ? (
-                                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                            ) : (
-                                <Icons.trash className="mr-2 h-4 w-4" />
-                            )}
+                            {isPublishLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
                             {article.is_published ? <span>Unpublish</span> : <span>Publish</span>}
                         </AlertDialogAction>
                     </AlertDialogFooter>

@@ -2,7 +2,6 @@
 
 import React from 'react'
 import createArticle from '@/actions/articles/create';
-import { RichTextEditor } from './rich-text-editor';
 import TextareaAutosize from 'react-textarea-autosize'
 import EditorJS from "@editorjs/editorjs"
 import "@/styles/editor.css"
@@ -56,7 +55,7 @@ import { articleEditFormSchema } from '@/lib/validations/article';
 import { toast } from './ui/use-toast';
 import { useRouter } from 'next/navigation';
 import EditorUploadCoverImageItem from './editor-upload-cover-image-item';
-import { createBrowserClient } from '@/utils/supabase/client';
+import { createBrowserClient } from '@/lib/supabase/client';
 import { Textarea } from './ui/textarea';
 import { Car, ChevronLeft, SparklesIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -86,7 +85,6 @@ const NewEditor = ({ article }: { article: Article }) => {
         defaultValues,
         mode: "onChange",
     });
-
 
     // Setup Uppy with Supabase
     const bucketNameCoverImage = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET_COVER_IMAGE!;
@@ -132,6 +130,7 @@ const NewEditor = ({ article }: { article: Article }) => {
 
     uppyCover.on("complete", async (result) => {
         if (result.successful.length > 0) {
+
             // update article with cover_image column
             const uploadedImageName = result.successful[0].name;
             const supabase = createBrowserClient();
@@ -162,9 +161,8 @@ const NewEditor = ({ article }: { article: Article }) => {
         const LinkTool = (await import("@editorjs/link")).default
         const InlineCode = (await import("@editorjs/inline-code")).default
 
-        const body = articlePatchSchema.parse(article);
-        let content = '';
-        if (body.content) content = JSON.parse(body.content);
+        const { content } = articlePatchSchema.parse(article);
+        const body = JSON.parse(content);
 
         if (!ref.current) {
             const editor = new EditorJS({
@@ -174,7 +172,7 @@ const NewEditor = ({ article }: { article: Article }) => {
                 },
                 placeholder: "Type here to write your content...",
                 inlineToolbar: true,
-                data: content,
+                data: body,
                 tools: {
                     header: Header,
                     linkTool: LinkTool,
@@ -183,7 +181,7 @@ const NewEditor = ({ article }: { article: Article }) => {
                     inlineCode: InlineCode,
                     table: Table,
                     embed: Embed,
-                },
+                }
             })
         }
     }, [article])
@@ -195,7 +193,7 @@ const NewEditor = ({ article }: { article: Article }) => {
     }, [])
 
     React.useEffect(() => {
-        if (isMounted) {
+        if (isMounted || ref.current === null) {
             initializeEditor()
 
             return () => {
@@ -205,9 +203,6 @@ const NewEditor = ({ article }: { article: Article }) => {
         }
     }, [isMounted, initializeEditor])
 
-    if (!isMounted) {
-        return null
-    }
 
     const onSubmit = async (data: EditorFormValues) => {
         setShowLoadingAlert(true);
@@ -225,9 +220,6 @@ const NewEditor = ({ article }: { article: Article }) => {
             toast({
                 description: "You're article has been saved",
             })
-
-            // redirecting to this url with search=refresh we indicate that the page need to be refreshed
-            // router.push(`/dashboard/?search=refresh`);
             router.refresh();
         } else {
             toast({
@@ -238,7 +230,9 @@ const NewEditor = ({ article }: { article: Article }) => {
         setShowLoadingAlert(false);
         setIsSaving(false);
 
+
     }
+
 
     return (
         <>
@@ -334,15 +328,18 @@ const NewEditor = ({ article }: { article: Article }) => {
                             </CardDescription>
                         </CardHeader>
                         <CardContent className='space-y-4'>
-                            <div className="prose !w-full !max-w-full prose-stone mx-auto dark:prose-invert border-black "> <TextareaAutosize
-                                autoFocus
-                                id="title"
-                                defaultValue={article.title}
-                                placeholder="Article"
-                                className="w-full resize-none font-sans appearance-none overflow-hidden bg-transparent text-5xl font-black focus:outline-none"
-                                {...form.register("title")}
-                            />
+                            <div className="prose !w-full !max-w-full prose-stone mx-auto dark:prose-invert border-black ">
+                                {form.formState.errors.title?.message && <span className='text-red-500'>{form.formState.errors.title?.message}</span>}
+                                <TextareaAutosize
+                                    autoFocus
+                                    id="title"
+                                    defaultValue={article.title}
+                                    placeholder="Article"
+                                    className="w-full resize-none font-sans appearance-none overflow-hidden bg-transparent text-5xl font-black focus:outline-none"
+                                    {...form.register("title")}
+                                />
                                 <div id="editor" className="min-h-[500px] " />
+
                             </div>
                         </CardContent>
                     </Card>

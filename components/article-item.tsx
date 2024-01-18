@@ -3,6 +3,7 @@ import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ArticleOperations } from "@/components/article-operations"
 import { formatDate } from "@/lib/utils"
+import { Separator } from "./ui/separator"
 
 interface ArticleItemProps {
     article: {
@@ -11,6 +12,7 @@ interface ArticleItemProps {
         is_published: boolean,
         updated_at: string,
         created_at: string
+        always_show: boolean
     }
 
 }
@@ -31,7 +33,12 @@ export function ArticleItem({ article }: ArticleItemProps) {
                     </p>
                 </div>
             </div>
-            <ArticleOperations article={{ id: article.id, title: article.title, is_published: article.is_published }} />
+            {article.is_published &&
+                <div className="rounded text-sm py-1 px-2 ml-auto mr-4 border text-muted-foreground border-input bg-background hover:bg-accent hover:text-accent-foreground">
+                    <span>Published</span>
+                </div>
+            }
+            <ArticleOperations article={{ id: article.id, title: article.title, is_published: article.is_published, always_show: article.always_show }} />
         </div>
     )
 }

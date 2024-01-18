@@ -11,51 +11,28 @@ import {
 } from "@/components/ui/dialog"
 import SearchBox from "@/components/search-box";
 import SideNavbar from "./side-navbar";
-import { createBrowserClient } from "@/utils/supabase/client";
+import { createBrowserClient } from "@/lib/supabase/client";
 import { toast } from "./ui/use-toast";
 import { Button, buttonVariants } from "./ui/button";
 import { SheetTrigger, Sheet, SheetContent } from "./ui/sheet";
-import { SearchIcon } from "lucide-react";
+import { Icons } from "./icons";
+import { useNavbarVisible } from "@/hooks/use-nav-visible";
 
 const Navbar = ({ token }: { token: string }) => {
-    const [show, setShow] = React.useState(true);
-    const [lastScrollY, setLastScrollY] = React.useState(0);
     const supabase = createBrowserClient();
     const router = useRouter();
-
-    const controlNavbar = () => {
-        if (window.scrollY > lastScrollY) { // if scroll down hide the navbar
-            setShow(false);
-        } else { // if scroll up show the navbar
-            setShow(true);
-        }
-
-        // remember current page location to use in the next move
-        setLastScrollY(window.scrollY);
-    };
-
-    React.useEffect(() => {
-        window.addEventListener('scroll', controlNavbar);
-
-        // cleanup function
-        return () => {
-            window.removeEventListener('scroll', controlNavbar);
-        };
-    }, [lastScrollY]);
+    const { show } = useNavbarVisible();
 
     const handleSignOut = async () => {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) return;
-
         const { error } = await supabase.auth.signOut();
         if (error) {
             return toast({
-                description: "Something went wrong while signing out",
-                variant: "destructive"
+                title: "Uh oh! Something went wrong.",
+                description: "There was a problem with your request.",
             })
         }
         toast({
-            description: "Signout Successfully",
+            description: "Action Signout executed Successfully.",
             variant: "default"
         })
         router.refresh();
@@ -79,13 +56,10 @@ const Navbar = ({ token }: { token: string }) => {
                     </span>
                 </div>
                 <div className="flex items-center justify-end w-2/6 text-gray-900">
-                    {/* <Button className={clsx(buttonVariants({ variant: "outline" }), ' mr-7')}> */}
-                    {/*     Suscribe to newsletter */}
-                    {/* </Button> */}
                     <Dialog>
                         <DialogTrigger>
                             <span className="cursor-pointer">
-                                <SearchIcon width={20} />
+                                <Icons.search width={20} />
                             </span>
                         </DialogTrigger>
                         <DialogContent>
@@ -108,11 +82,18 @@ const Navbar = ({ token }: { token: string }) => {
                         </SheetContent>
                     </Sheet>
                     {token === "" ?
-                        <Link href="/login">
-                            <Button className={clsx('ml-5')}>
-                                Login
-                            </Button>
-                        </Link>
+                        <>
+                            <Link href="/login">
+                                <Button variant="outline" className={clsx('ml-5')}>
+                                    Login
+                                </Button>
+                            </Link>
+                            <Link href="/register">
+                                <Button className={clsx('ml-5')}>
+                                    Register
+                                </Button>
+                            </Link>
+                        </>
                         :
                         <>
                             <Link href="/dashboard">

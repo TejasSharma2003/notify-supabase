@@ -1,5 +1,5 @@
 import { getMinutes, shimmer, toBase64 } from "@/lib/utils";
-import { createServerClient } from "@/utils/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 import { ArchiveIcon, CalendarIcon, ClockIcon } from "lucide-react";
 import { cookies } from "next/headers";
 import Image from "next/image";

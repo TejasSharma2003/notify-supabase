@@ -1,9 +1,8 @@
 import { notFound } from "next/navigation"
 
-import { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
-import { createServerClient } from "@/utils/supabase/server"
+import { createServerClient } from "@/lib/supabase/server"
 
 import { buttonVariants } from "@/components/ui/button"
 import Content from "@/components/content"
@@ -11,20 +10,8 @@ import { Icons } from "@/components/icons"
 import { cn, formatDate } from "@/lib/utils"
 import { Database } from "@/types/supabase"
 import { cookies } from "next/headers"
-
-async function getPublicImageUrl(author_id: string, fileName: string) {
-    const cookieStore = cookies();
-    const supabase = createServerClient<Database>(cookieStore);
-    const bucketName =
-        process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET_POSTS || "cover-image";
-    const { data } = supabase.storage
-        .from(bucketName)
-        .getPublicUrl(`${author_id}/${fileName}`);
-
-    if (data && data.publicUrl) return data.publicUrl;
-
-    return "/images/not-found.jpg";
-}
+import ArticleScrollUpButton from "@/components/article-scroll-up-button"
+import { getPublicImageUrl } from "@/actions/images/get-public-url"
 
 interface PostPageProps {
     params: {
@@ -46,16 +33,29 @@ async function getArticle(params: { slug: string[] }) {
     if (!response.data) {
         notFound;
     }
+
     return response.data;
 }
 
 
-export default async function PostPage({ params }: PostPageProps) {
-    const article = await getArticle(params)
+const updateReadingCount = async (articleId: string) => {
+    const cookieStore = cookies();
+    const supabase = createServerClient<Database>(cookieStore);
 
+    // updating read count on the article
+    await supabase.rpc("increment_reads", { x: 1, articles_id: articleId });
+}
+
+export default async function PostPage({ params }: PostPageProps) {
+    // fetching the article
+    const article = await getArticle(params)
     if (!article) {
         notFound()
     }
+
+    await updateReadingCount(article.id);
+
+    const coverImageUrl = await getPublicImageUrl({ authorId: article.author_id!, fileName: article.cover_image });
 
     return (
         <article className="container relative max-w-3xl py-6 lg:py-10">
@@ -80,14 +80,14 @@ export default async function PostPage({ params }: PostPageProps) {
                 </h1>
             </div>
             <Image
-                src={await getPublicImageUrl(article.author_id, article.cover_image)}
+                src={coverImageUrl}
                 alt={article.title}
                 width={720}
                 height={405}
                 className="my-8 rounded-md border bg-muted transition-colors"
                 priority
             />
-            <Content content={article.content}/>
+            <Content content={article.content || ""} />
             <hr className="mt-12" />
             <div className="flex justify-center py-6 lg:py-10">
                 <Link href="/" className={cn(buttonVariants({ variant: "ghost" }))}>
@@ -95,6 +95,7 @@ export default async function PostPage({ params }: PostPageProps) {
                     See all articles
                 </Link>
             </div>
+            <ArticleScrollUpButton />
         </article>
     )
 }

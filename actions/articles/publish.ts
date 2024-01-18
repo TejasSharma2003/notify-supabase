@@ -1,6 +1,6 @@
 "use server"
 import { cookies } from "next/headers";
-import { createServerClient } from "@/utils/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 import { Database } from "@/types/supabase";
 
 const publishArticle = async (articleId: string) => {

@@ -1,7 +1,7 @@
 "use server"
 
 import { cookies } from "next/headers"
-import { createServerClient } from "@/utils/supabase/server"
+import { createServerClient } from "@/lib/supabase/server"
 import { Database } from "@/types/supabase"
 
 interface createAriticleProps {
@@ -17,7 +17,7 @@ export default async function createArticle(article: createAriticleProps) {
         const cookieStore = cookies();
         const supabase = createServerClient<Database>(cookieStore);
 
-        const { data, error } = await supabase.from("articles").update({
+        const { error } = await supabase.from("articles").update({
             title: article.title,
             slug: article.slug,
             description: article.description,

@@ -15,57 +15,59 @@ type LikeButtonProps = {
 
 const LikeButton = ({ articleId, likes }: LikeButtonProps) => {
     const [locallyLikedArticles, setLocallyLikedArticles] = React.useState<string[]>([]);
-
-    // optimistic updates
-    const [optimisticLikes, addOptimisticLikes] = React.useOptimistic(
-        likes,
-        (state, l: number) => state + l
-    )
+    const [optimisticLikes, setOptimisticLikes] = React.useState(likes);
+    const [isLiked, setIsLiked] = React.useState(false);
 
     React.useEffect(() => {
         let data = localStorage.getItem('likedArticles');
         if (data) {
-            setLocallyLikedArticles(JSON.parse(data));
+            const likedArticles = JSON.parse(data);
+            // check if the current article exists in the local storage
+            const isExists = likedArticles.some((id: string) => id === articleId);
+            setIsLiked(isExists);
+            setLocallyLikedArticles(likedArticles);
         }
-    }, [])
+    }, [articleId])
 
     const onHandleLike = async () => {
-        addOptimisticLikes(1);
-        await likeArticle(articleId);
-        // if (alreadyLiked) {
-        // const res = await unLikeArticle(articleId);
-        //     if (!res) {
-        //         return toast({
-        //             description: "Something went wront"
-        //         })
-        //     }
-        //     const filterArtiles = locallyLikedArticles.filter(id => id !== articleId);
-        //     localStorage.setItem('likedArticles', JSON.stringify(filterArtiles));
-        //     setLocallyLikedArticles(filterArtiles);
-        //     return;
-        // }
-        // addOptimisticLikes(1);
-        // const res = await likeArticle(articleId);
-        // if (!res) {
-        //     return toast({
-        //         description: "Something went wrong!"
-        //     })
-        // }
-        // localStorage.setItem('likedArticles', JSON.stringify([...locallyLikedArticles, articleId]));
-        // setLocallyLikedArticles([...locallyLikedArticles, articleId]);
+        const alreadyLiked = locallyLikedArticles.some(id => id === articleId);
+        if (alreadyLiked) {
+            // check if the likes less than 0 if it is then return we don't want to be our likes be in negative.
+            if (likes <= 0) return;
+            setIsLiked(false);
+            setOptimisticLikes(pre => pre - 1);
+            const res = await unLikeArticle({ articleId, likes });
+            if (!res) {
+                return toast({
+                    description: "Something went wront"
+                })
+            }
+            const filterArtiles = locallyLikedArticles.filter(id => id !== articleId);
+            localStorage.setItem('likedArticles', JSON.stringify(filterArtiles));
+            setLocallyLikedArticles(filterArtiles);
+            return;
+        }
+        setIsLiked(true);
+        setOptimisticLikes(pre => pre + 1);
+        const res = await likeArticle(articleId);
+        if (!res) {
+            return toast({
+                description: "Something went wrong!"
+            })
+        }
+        localStorage.setItem('likedArticles', JSON.stringify([...locallyLikedArticles, articleId]));
+        setLocallyLikedArticles([...locallyLikedArticles, articleId]);
     }
 
-    const isLiked = false;
-
     return (
-        <span className="flex items-center cursor-pointer" onClick={onHandleLike}>
+        <div className="flex items-center" onClick={onHandleLike}>
             <Heart className={
-                clsx({
+                cn({
                     "stroke-red-500": !isLiked,
                     "fill-red-500 stroke-none": isLiked
                 })
             } width={20} /> <span className="ml-1">{optimisticLikes}</span>
-        </span>
+        </div>
     )
 }
 

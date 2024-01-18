@@ -1,6 +1,7 @@
 // import { DetailArticleHeader } from "@/components/detail/article";
+import TrackReader from "@/components/tracker-reader";
 import type { Database } from "@/types/supabase";
-import { createServerClient } from "@/utils/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 

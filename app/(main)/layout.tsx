@@ -2,12 +2,12 @@ import React from "react"
 import Navbar from "@/components/navbar"
 import RespectNavbar from "@/components/respect-navbar"
 import { cookies } from "next/headers"
-import { createServerClient } from "@/utils/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 import { Database } from "@/types/supabase";
 
 export default async function MarketingLayout({ children }: { children: React.ReactNode }) {
     const cookieStore = cookies();
-    const supabase = await createServerClient<Database>(cookieStore);
+    const supabase = createServerClient<Database>(cookieStore);
 
     const { data: { session } } = await supabase.auth.getSession();
 

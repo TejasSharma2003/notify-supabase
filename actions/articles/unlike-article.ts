@@ -1,14 +1,19 @@
 "use server"
 
 import { cookies } from "next/headers"
-import { createServerClient } from "@/utils/supabase/server"
+import { createServerClient } from "@/lib/supabase/server"
 import { Database } from "@/types/supabase";
 
-export default async function likeArticle(articleId: string) {
+type unLikeArticleProps = {
+    articleId: string,
+    likes: number
+}
+export default async function unLikeArticle(context: unLikeArticleProps) {
     try {
         const cookieStore = cookies();
         const supabase = createServerClient<Database>(cookieStore);
-        const { data, error } = await supabase.rpc('decrement', { x: 1, articles_id: articleId })
+        if (context.likes <= 0) return false;
+        const { error } = await supabase.rpc('decrement', { x: 1, articles_id: context.articleId })
         if (error) {
             console.log(error);
             return false;
