@@ -56,7 +56,7 @@
         "react-slugify": "^3.0.3",
         "react-textarea-autosize": "^8.5.3",
         "reading-time": "^1.5.0",
-        "sharp": "^0.33.2",
+        "sharp": "^0.33.1",
         "tailwind-merge": "^2.2.0",
         "tailwindcss-animate": "^1.0.7",
         "uuid": "^9.0.1",
