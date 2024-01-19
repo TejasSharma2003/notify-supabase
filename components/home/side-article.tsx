@@ -24,7 +24,7 @@ const SingleSideArticle = async ({ article }: { article: Article }) => {
                 </div>
                 <div className="rounded overflow-hidden order-first">
                     <Image
-                        src={await getPublicImageUrl({ authorId: article.author_id, fileName: article.cover_image })}
+                        src={await getPublicImageUrl({ authorId: article.user_id, fileName: article.cover_image })}
                         className="block hover:scale-110 transition-transform object-cover  h-full"
                         alt="cover-image"
                         width={204}

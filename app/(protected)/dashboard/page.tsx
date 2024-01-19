@@ -27,7 +27,7 @@ export default async function DashboardPage() {
         .from("articles")
         .select('id, title, updated_at, created_at, is_published, always_show')
         .order('created_at', { ascending: false })
-        .eq('author_id', authorId);
+        .eq('user_id', authorId);
 
     if (!articles?.length || error) {
         notFound;

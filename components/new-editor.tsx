@@ -123,7 +123,7 @@ const NewEditor = ({ article }: { article: Article }) => {
         file.meta = {
             ...file.meta,
             bucketName: bucketNameCoverImage,
-            objectName: `${article.author_id}/${article.id}-${file.name}`,
+            objectName: `${article.user_id}/${article.id}-${file.name}`,
             contentType: file.type,
         };
     });
@@ -308,7 +308,7 @@ const NewEditor = ({ article }: { article: Article }) => {
 
                                 {article.cover_image !== "" ? (
                                     <EditorUploadCoverImageItem
-                                        authorId={article.author_id}
+                                        authorId={article.user_id}
                                         articleId={article.id}
                                         coverImage={article.cover_image}
                                     />

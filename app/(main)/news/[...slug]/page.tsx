@@ -1,17 +1,17 @@
 import { notFound } from "next/navigation"
-
 import Image from "next/image"
 import Link from "next/link"
+import { cookies } from "next/headers"
+
 import { createServerClient } from "@/lib/supabase/server"
+import { cn, formatDate } from "@/lib/utils"
 
 import { buttonVariants } from "@/components/ui/button"
-import Content from "@/components/content"
 import { Icons } from "@/components/icons"
-import { cn, formatDate } from "@/lib/utils"
-import { Database } from "@/types/supabase"
-import { cookies } from "next/headers"
+import Content from "@/components/content"
 import ArticleScrollUpButton from "@/components/article-scroll-up-button"
 import { getPublicImageUrl } from "@/actions/images/get-public-url"
+import { Database } from "@/types/supabase"
 
 interface PostPageProps {
     params: {
@@ -38,7 +38,7 @@ async function getArticle(params: { slug: string[] }) {
 }
 
 
-const updateReadingCount = async (articleId: string) => {
+async function updateReadingCount(articleId: string) {
     const cookieStore = cookies();
     const supabase = createServerClient<Database>(cookieStore);
 
@@ -47,15 +47,16 @@ const updateReadingCount = async (articleId: string) => {
 }
 
 export default async function PostPage({ params }: PostPageProps) {
+
     // fetching the article
     const article = await getArticle(params)
+
     if (!article) {
         notFound()
     }
 
-    await updateReadingCount(article.id);
-
-    const coverImageUrl = await getPublicImageUrl({ authorId: article.author_id!, fileName: article.cover_image });
+    const coverImageUrlRes = getPublicImageUrl({ authorId: article.user_id!, fileName: article.cover_image });
+    const [coverImageUrl] = await Promise.all([coverImageUrlRes, updateReadingCount(article.id)]);
 
     return (
         <article className="container relative max-w-3xl py-6 lg:py-10">

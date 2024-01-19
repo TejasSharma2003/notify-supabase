@@ -12,7 +12,6 @@ export interface Database {
       articles: {
         Row: {
           always_show: boolean
-          author_id: string
           content: string | null
           cover_image: string
           created_at: string
@@ -25,10 +24,10 @@ export interface Database {
           slug: string
           title: string
           updated_at: string
+          user_id: string
         }
         Insert: {
           always_show?: boolean
-          author_id?: string
           content?: string | null
           cover_image?: string
           created_at?: string
@@ -41,10 +40,10 @@ export interface Database {
           slug?: string
           title?: string
           updated_at?: string
+          user_id?: string
         }
         Update: {
           always_show?: boolean
-          author_id?: string
           content?: string | null
           cover_image?: string
           created_at?: string
@@ -57,6 +56,7 @@ export interface Database {
           slug?: string
           title?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -65,27 +65,7 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      decrement: {
-        Args: {
-          x: number
-          articles_id: string
-        }
-        Returns: undefined
-      }
-      increment: {
-        Args: {
-          x: number
-          articles_id: string
-        }
-        Returns: undefined
-      }
-      increment_reads: {
-        Args: {
-          x: number
-          articles_id: string
-        }
-        Returns: undefined
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never

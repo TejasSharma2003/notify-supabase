@@ -24,7 +24,7 @@ export default async function EditorPage({ params }: EditorPageProps) {
         .from("articles")
         .select()
         .eq('id', articleId)
-        .eq('author_id', session?.user.id)
+        .eq('user_id', session?.user.id)
         .single();
 
     if (!article) {

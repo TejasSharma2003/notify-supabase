@@ -8,9 +8,6 @@ import { cookies } from "next/headers";
 import { NUMBER_OF_ROWS } from "@/config/site";
 import BottomArticleBar from "./bottom-article-bar";
 import { getPublicImageUrl } from "@/actions/images/get-public-url";
-import { unstable_noStore } from "next/cache";
-
-
 
 const SingleArticle = async ({ article }: { article: Article }) => {
     return (
@@ -27,8 +24,8 @@ const SingleArticle = async ({ article }: { article: Article }) => {
                 </div>
                 <div className="overflow-hidden rounded ml-auto">
                     <Image
-                        src={await getPublicImageUrl({ authorId: article.author_id, fileName: article.cover_image })}
-                        alt={article.header_image || "cover"}
+                        src={await getPublicImageUrl({ authorId: article.user_id, fileName: article.cover_image })}
+                        alt={article.cover_image || "cover"}
                         className="hover:scale-110 w-full h-full transition-transform object-cover"
                         width={240}
                         height={162}

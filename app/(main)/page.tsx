@@ -4,7 +4,7 @@ import Article from "@/components/home/article";
 import SideArticle from "@/components/home/side-article";
 import MainSkeletonArticle from "@/components/ui/article/skeletons/main-skeleton-article";
 
-export const revalidate = 0;
+export const revalidate = 3600 // revalidate date every hour
 
 const IndexPage = () => {
     return (

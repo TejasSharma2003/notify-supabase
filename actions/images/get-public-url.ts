@@ -12,7 +12,7 @@ export async function getPublicImageUrl({ authorId, fileName = "" }: getPublicIm
     const cookiesStore = cookies();
     const supabase = createServerClient(cookiesStore);
     const bucketName =
-        process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET_POSTS || "cover-image";
+        process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET_COVER_IMAGE || "cover_image";
     const { data } = supabase.storage
         .from(bucketName)
         .getPublicUrl(`${authorId}/${fileName}`);

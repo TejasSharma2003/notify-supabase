@@ -18,10 +18,11 @@ const deleteArticle = async (articleId: string) => {
 
 
         // delete the assets such as cover_image from the storage bucket
+        const bucketName = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET_COVER_IMAGE || "cover_image"
         const { error: storageErr } = await supabase
             .storage
-            .from('cover-image')
-            .remove([`${deletedArticle.author_id}/${deletedArticle.cover_image}`])
+            .from(bucketName)
+            .remove([`${deletedArticle.user_id}/${deletedArticle.cover_image}`])
 
         if(storageErr) {
             console.log("This is storage error in file delete.ts its a server action", storageErr);
