@@ -8,8 +8,9 @@ import { cookies } from "next/headers";
 import { NUMBER_OF_ROWS } from "@/config/site";
 import BottomArticleBar from "./bottom-article-bar";
 import { getPublicImageUrl } from "@/actions/images/get-public-url";
+import { Suspense } from "react";
 
-const SingleArticle = async ({ article }: { article: Article }) => {
+export const SingleArticle = async ({ article }: { article: Article }) => {
     return (
         <article className="font-sans max-w-[640px]">
             <div className="grid  grid-cols-[1.5fr_1fr] ">
@@ -17,7 +18,7 @@ const SingleArticle = async ({ article }: { article: Article }) => {
                     <span className="text-sm text-gray-500">
                         {formatDate(article.updated_at)}
                     </span>
-                    <h3 className="mt-3 text-2xl text-gray-700 font-semibold leading-8">{article.title}</h3>
+                    <h3 className="mt-3 text-2xl text-gray-700 font-semibold leading-8 line-clamp-3">{article.title}</h3>
                     <Link href={`/news/${article.slug}`} className="absolute inset-0">
                         <span className="sr-only">View Article</span>
                     </Link>
@@ -29,7 +30,8 @@ const SingleArticle = async ({ article }: { article: Article }) => {
                         className="hover:scale-110 w-full h-full transition-transform object-cover"
                         width={240}
                         height={162}
-                        placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(240, 162))}`}
+                        priority
+                        placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(256, 144))}`}
                     />
                 </div>
             </div>
@@ -58,6 +60,7 @@ const Article = async () => {
         .limit(NUMBER_OF_ROWS);
 
     if (error) {
+        console.log(error);
         return <h1>There is an error</h1>
     };
 

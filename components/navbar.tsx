@@ -3,7 +3,7 @@ import Logo from "./logo";
 import React from "react";
 import clsx from "clsx";
 import Link from "next/link";
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import {
     Dialog,
     DialogContent,
@@ -16,12 +16,15 @@ import { toast } from "./ui/use-toast";
 import { Button, buttonVariants } from "./ui/button";
 import { SheetTrigger, Sheet, SheetContent } from "./ui/sheet";
 import { Icons } from "./icons";
-import { useNavbarVisible } from "@/hooks/use-nav-visible";
 
-const Navbar = ({ token }: { token: string }) => {
+type NavbarProps = {
+    isAuthenticated: boolean
+}
+
+const Navbar = (context: NavbarProps) => {
     const supabase = createBrowserClient();
     const router = useRouter();
-    const { show } = useNavbarVisible();
+    const pathname = usePathname();
 
     const handleSignOut = async () => {
         const { error } = await supabase.auth.signOut();
@@ -29,19 +32,15 @@ const Navbar = ({ token }: { token: string }) => {
             return toast({
                 title: "Uh oh! Something went wrong.",
                 description: "There was a problem with your request.",
+                variant: "destructive"
             })
         }
-        toast({
-            description: "Action Signout executed Successfully.",
-            variant: "default"
-        })
         router.refresh();
     }
 
+
     return (
-        <div className={clsx(`fixed h-20 top-0 z-20 w-full bg-white border-b border-b-border transition-transform duration-300`, {
-            '-translate-y-full': !show,
-        })}>
+        <header className="sticky top-0 w-full bg-white z-[500] border-b border-b-border">
             <nav className="font-sans flex container items-center py-5">
                 <Logo />
                 <div className="w-2/6 text-xs font-semibold flex justify-center text-gray-500">
@@ -56,17 +55,21 @@ const Navbar = ({ token }: { token: string }) => {
                     </span>
                 </div>
                 <div className="flex items-center justify-end w-2/6 text-gray-900">
-                    <Dialog>
-                        <DialogTrigger>
-                            <span className="cursor-pointer">
-                                <Icons.search width={20} />
-                            </span>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <SearchBox />
-                        </DialogContent>
-                    </Dialog>
-                    <div className="w-[1px] h-5 mx-5 bg-gray-400"></div>
+                    {!pathname.includes("search") &&
+                        <>
+                            <Dialog>
+                                <DialogTrigger>
+                                    <span className="cursor-pointer">
+                                        <Icons.search width={20} />
+                                    </span>
+                                </DialogTrigger>
+                                <DialogContent className="">
+                                    <SearchBox />
+                                </DialogContent>
+                            </Dialog>
+                            <div className="w-[1px] h-5 mx-5 bg-gray-400"></div>
+                        </>
+                    }
                     <Sheet>
                         <SheetTrigger>
                             <div className="flex items-center text-sm cursor-pointer">
@@ -81,7 +84,18 @@ const Navbar = ({ token }: { token: string }) => {
                             <SideNavbar />
                         </SheetContent>
                     </Sheet>
-                    {token === "" ?
+                    {context.isAuthenticated ?
+                        <>
+                            <Link href="/dashboard">
+                                <Button className={clsx('ml-5')}>
+                                    Dashboard
+                                </Button>
+                            </Link>
+                            <Button onClick={handleSignOut} className={clsx('ml-5', buttonVariants({ variant: "outline" }))}>
+                                Signout
+                            </Button>
+                        </>
+                        :
                         <>
                             <Link href="/login">
                                 <Button variant="outline" className={clsx('ml-5')}>
@@ -94,21 +108,10 @@ const Navbar = ({ token }: { token: string }) => {
                                 </Button>
                             </Link>
                         </>
-                        :
-                        <>
-                            <Link href="/dashboard">
-                                <Button className={clsx('ml-5')}>
-                                    Dashboard
-                                </Button>
-                            </Link>
-                            <Button onClick={handleSignOut} className={clsx('ml-5', buttonVariants({ variant: "outline" }))}>
-                                Signout
-                            </Button>
-                        </>
                     }
                 </div>
             </nav>
-        </div>
+        </header>
     )
 }
 

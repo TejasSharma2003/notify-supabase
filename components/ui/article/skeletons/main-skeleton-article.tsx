@@ -12,7 +12,7 @@ const MainArticleItemDesktopLoading = () => {
                         <div className="mb-2.5 h-3 w-[396px] rounded-full bg-gray-200 dark:bg-gray-700"></div>
                         <span className="sr-only">Loading...</span>
                     </div>
-                    <div className="mt-4 flex h-[162px] w-[240px] items-center justify-center rounded bg-gray-300 dark:bg-gray-700">
+                    <div className="mt-4 flex  w-[256px] h-[144px] items-center justify-center rounded bg-gray-300 dark:bg-gray-700">
                         <svg
                             className="h-10 w-10 text-gray-200 dark:text-gray-600"
                             aria-hidden="true"
@@ -38,18 +38,19 @@ const MainArticleItemDesktopLoading = () => {
     );
 };
 
-const MainSkeletonArticle = () => {
+type MainSkeletonArticleProps = {
+    className?: string
+}
+
+const MainSkeletonArticle = ({ className }: MainSkeletonArticleProps) => {
     return (
-        <>
-            {/* LoadingItems */}
-            <div className="flex flex-col">
-                <MainArticleItemDesktopLoading />
-                <MainArticleItemDesktopLoading />
-                <MainArticleItemDesktopLoading />
-                <MainArticleItemDesktopLoading />
-                <MainArticleItemDesktopLoading />
-            </div>
-        </>
+        < div className={`grid gap-y-14 justify-center ${className}`} >
+            <MainArticleItemDesktopLoading />
+            <MainArticleItemDesktopLoading />
+            <MainArticleItemDesktopLoading />
+            <MainArticleItemDesktopLoading />
+            <MainArticleItemDesktopLoading />
+        </div >
     );
 };
 

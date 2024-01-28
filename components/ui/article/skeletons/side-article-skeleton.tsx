@@ -1,3 +1,5 @@
+import { Skeleton } from "../../skeleton";
+
 const SideArticleItemDesktopLoading = () => {
     return (
         <div
@@ -17,7 +19,7 @@ const SideArticleItemDesktopLoading = () => {
                         </div>
                         <span className="sr-only">Loading...</span>
                     </div>
-                    <div className="mt-4  flex-1 flex h-[162px] w-[218px] items-center justify-center rounded bg-gray-300 dark:bg-gray-700">
+                    <div className="mt-4  flex-1 flex h-[137px] w-[204px] items-center justify-center rounded bg-gray-300 dark:bg-gray-700">
                         <svg
                             className="h-10 w-10 text-gray-200 dark:text-gray-600"
                             aria-hidden="true"
@@ -40,12 +42,15 @@ const SideArticleItemDesktopLoading = () => {
 export default function SideSkeletonArticle() {
     return (
         <div className="sticky top-0 self-start max-w-lg">
-            <SideArticleItemDesktopLoading />
-            <SideArticleItemDesktopLoading />
-            <SideArticleItemDesktopLoading />
-            <SideArticleItemDesktopLoading />
-            <SideArticleItemDesktopLoading />
-            <SideArticleItemDesktopLoading />
+            <div className="grid gap-10">
+                <Skeleton className="w-40 h-8"/>
+                <SideArticleItemDesktopLoading />
+                <SideArticleItemDesktopLoading />
+                <SideArticleItemDesktopLoading />
+                <SideArticleItemDesktopLoading />
+                <SideArticleItemDesktopLoading />
+                <SideArticleItemDesktopLoading />
+            </div>
         </div>
 
     )

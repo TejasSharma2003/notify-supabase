@@ -7,6 +7,7 @@ import Image from "next/image"
 import { v4 } from 'uuid'
 import BottomArticleBar from "./bottom-article-bar"
 import { getPublicImageUrl } from "@/actions/images/get-public-url"
+import { Icons } from "../icons"
 
 const SingleSideArticle = async ({ article }: { article: Article }) => {
     return (
@@ -25,7 +26,7 @@ const SingleSideArticle = async ({ article }: { article: Article }) => {
                 <div className="rounded overflow-hidden order-first">
                     <Image
                         src={await getPublicImageUrl({ authorId: article.user_id, fileName: article.cover_image })}
-                        className="block hover:scale-110 transition-transform object-cover  h-full"
+                        className="block hover:scale-110 transition-transform object-cover w-full h-full"
                         alt="cover-image"
                         width={204}
                         height={137}
@@ -34,8 +35,8 @@ const SingleSideArticle = async ({ article }: { article: Article }) => {
             </div>
         </article>
     )
-
 }
+
 
 const SideArticle = async () => {
     const cookieStore = cookies();
@@ -53,11 +54,12 @@ const SideArticle = async () => {
     };
 
     if (articles?.length === 0) {
-        return <h1>All tasted.</h1>
+        return;
     }
 
     return (
-        <div className="sticky top-0 self-start max-w-lg">
+        <div className="sticky top-[120px] self-start max-w-lg">
+            <h1 className="font-heading text-muted-foreground text-2xl mb-8">Recent update&apos;s</h1>
             <div className="grid gap-10">
                 {articles.map((article) => (
                     <SingleSideArticle key={v4()} article={article} />

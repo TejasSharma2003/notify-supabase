@@ -4,26 +4,22 @@ import { cookies } from 'next/headers'
 import Navbar from '@/components/navbar'
 import RespectNavbar from '@/components/respect-navbar'
 import { createServerClient } from "@/lib/supabase/server"
+import isUserAuthenticated from '@/lib/auth'
 
 
 const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
-    const cookieStore = cookies();
-    const supabase = createServerClient(cookieStore);
+    const isAuthenticated = await isUserAuthenticated();
 
-    const { data: { session } } = await supabase.auth.getSession();
-
-    if (!session?.access_token) {
+    if (!isUserAuthenticated) {
         redirect("/login");
     }
 
     return (
         <div>
-            <Navbar token={session.access_token}/>
-            <RespectNavbar>
-                <main className="max-w-4xl mx-auto flex w-full flex-1 flex-col overflow-hidden">
+            <Navbar isAuthenticated={isAuthenticated}/>
+                <main className="max-w-4xl mx-auto mt-8 flex w-full flex-1 flex-col overflow-hidden">
                     {children}
                 </main>
-            </RespectNavbar>
         </div>
 
 

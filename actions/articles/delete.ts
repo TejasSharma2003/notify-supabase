@@ -24,7 +24,7 @@ const deleteArticle = async (articleId: string) => {
             .from(bucketName)
             .remove([`${deletedArticle.user_id}/${deletedArticle.cover_image}`])
 
-        if(storageErr) {
+        if (storageErr) {
             console.log("This is storage error in file delete.ts its a server action", storageErr);
             return false;
         }

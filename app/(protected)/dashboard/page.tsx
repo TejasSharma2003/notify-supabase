@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import { EmptyPlaceholder } from "@/components/empty-placeholder"
 import { DashboardHeader } from "@/components/header"
 import { PostCreateButton } from "@/components/post-create-button"
@@ -20,6 +20,10 @@ export default async function DashboardPage() {
     const supabase = createServerClient<Database>(cookieStore);
 
     const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session?.user.id) {
+        redirect('/login');
+    }
 
     const authorId = session?.user.id!;
 
